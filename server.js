@@ -22,8 +22,14 @@ app.get("/api/room-exists/:roomId", (req, res) => {
 
   if (room) {
     // send response that room exists
+    if (room.connectedUsers.length > 3) {
+      return res.send({ roomExists: true, full: true });
+    } else {
+      return res.send({ roomExists: true, full: false });
+    }
   } else {
     // send response that room does not exists
+    return res.send({ roomExists: false });
   }
 });
 
@@ -32,6 +38,10 @@ const io = require("socket.io")(server, {
     origin: "*",
     methods: ["GET", "POST"],
   },
+});
+
+io.on("connection", (socket) => {
+  console.log(`user connected ${socket.id}`);
 });
 
 server.listen(PORT, () => {
