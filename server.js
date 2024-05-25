@@ -139,7 +139,7 @@ const disconnectHandler = (socket) => {
         connectedUsers: room.connectedUsers,
       });
     } else {
-      room = rooms.filter((r) => r.id !== room.id);
+      rooms = rooms.filter((r) => r.id !== room.id);
     }
   }
 };
