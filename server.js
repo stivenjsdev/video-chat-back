@@ -72,6 +72,17 @@ const createNewRoomHandler = (data, socket) => {
     id: roomId,
     connectedUsers: [newUser]
   }
+
+  // join socket.io room
+  socket.join(roomId);
+
+  rooms = [...rooms, newRoom];
+
+  // emit to that client which created that room roomId
+
+  // emit an event to all users connected to that room 
+  // about new users which are right in this room
+
 };
 
 server.listen(PORT, () => {
