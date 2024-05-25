@@ -44,10 +44,35 @@ io.on("connection", (socket) => {
   console.log(`user connected ${socket.id}`);
 
   socket.on("create-new-room", (data) => {
-    console.log("host is creating new room");
-    console.log(data);
+    createNewRoomHandler(data, socket);
   });
 });
+
+// socket.io handlers
+
+const createNewRoomHandler = (data, socket) => {
+  console.log("host is creating new room");
+  console.log(data);
+  const { identity } = data;
+  const roomId = uuidv4();
+
+  // create new user
+  const newUser = {
+    identity,
+    id: uuidv4(),
+    socketId: socket.id,
+    roomId
+  };
+
+  // push that user to connectedUsers
+  connectedUsers = [...connectedUsers, newUser];
+
+  // create new room
+  const newRoom = {
+    id: roomId,
+    connectedUsers: [newUser]
+  }
+};
 
 server.listen(PORT, () => {
   console.log(`Server is listening on ${PORT}`);
