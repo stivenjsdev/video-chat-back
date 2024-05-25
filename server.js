@@ -83,6 +83,7 @@ const createNewRoomHandler = (data, socket) => {
 
   // emit an event to all users connected to that room
   // about new users which are right in this room
+  socket.emit("room-update", { connectedUsers: newRoom.connectedUsers });
 };
 
 server.listen(PORT, () => {
