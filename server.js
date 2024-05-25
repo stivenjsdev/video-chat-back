@@ -50,6 +50,10 @@ io.on("connection", (socket) => {
   socket.on("join-room", (data) => {
     joinRoomHandler(data, socket);
   });
+
+  socket.on("disconnect", () => {
+    disconnectHandler(socket);
+  });
 });
 
 // socket.io handlers
@@ -97,8 +101,8 @@ const joinRoomHandler = (data, socket) => {
     identity,
     id: uuidv4(),
     socketId: socket.id,
-    roomId
-  }
+    roomId,
+  };
 
   // join room as user which just is trying to join room passing room id
   const room = rooms.find((room) => room.id === roomId);
@@ -110,7 +114,32 @@ const joinRoomHandler = (data, socket) => {
   // add new user to connected users array
   connectedUsers = [...connectedUsers, newUser];
 
-  io.to(roomId).emit('room-update', { connectedUsers: room.connectedUsers });
+  io.to(roomId).emit("room-update", { connectedUsers: room.connectedUsers });
+};
+
+const disconnectHandler = (socket) => {
+  // find if user has been registered - if yes remove him from room and connected users array
+  const user = connectedUsers.find((user) => user.socketId === socket.id);
+
+  if (user) {
+    // remove user from room in server
+    const room = rooms.find((room) => room.id === user.roomId);
+
+    room.connectedUsers = room.connectedUsers.filter(
+      (user) => user.socketId !== socket.id
+    );
+
+    // leave socket io room
+    socket.leave(user.roomId);
+
+    // emit an event to rest of the users which left in the room new connectedUsers in room
+    io.to(room.id).emit("room-update", {
+      connectedUsers: room.connectedUsers,
+    });
+
+    //TODO
+    // close the room if amount of the users which will stay in room will be 0
+  }
 };
 
 server.listen(PORT, () => {
