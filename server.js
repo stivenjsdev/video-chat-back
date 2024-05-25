@@ -61,7 +61,7 @@ const createNewRoomHandler = (data, socket) => {
     identity,
     id: uuidv4(),
     socketId: socket.id,
-    roomId
+    roomId,
   };
 
   // push that user to connectedUsers
@@ -70,8 +70,8 @@ const createNewRoomHandler = (data, socket) => {
   // create new room
   const newRoom = {
     id: roomId,
-    connectedUsers: [newUser]
-  }
+    connectedUsers: [newUser],
+  };
 
   // join socket.io room
   socket.join(roomId);
@@ -79,10 +79,10 @@ const createNewRoomHandler = (data, socket) => {
   rooms = [...rooms, newRoom];
 
   // emit to that client which created that room roomId
+  socket.emit("room-id", { roomId });
 
-  // emit an event to all users connected to that room 
+  // emit an event to all users connected to that room
   // about new users which are right in this room
-
 };
 
 server.listen(PORT, () => {
