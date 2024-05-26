@@ -54,6 +54,10 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     disconnectHandler(socket);
   });
+
+  socket.on("conn-signal", (data) => {
+    signalingHandler(data, socket);
+  });
 });
 
 // socket.io handlers
@@ -121,7 +125,7 @@ const joinRoomHandler = (data, socket) => {
         connUserSocketId: socket.id,
       };
 
-      io.to(user.socketId).emit('conn-prepare', data);
+      io.to(user.socketId).emit("conn-prepare", data);
     }
   });
 
@@ -153,6 +157,13 @@ const disconnectHandler = (socket) => {
       rooms = rooms.filter((r) => r.id !== room.id);
     }
   }
+};
+
+const signalingHandler = (data, socket) => {
+  const { connUserSocketId, signal } = data;
+
+  const signalingData = { signal, connUserSocketId: socket.id };
+  io.to(connUserSocketId).emit("conn-signal", signalingData);
 };
 
 server.listen(PORT, () => {
