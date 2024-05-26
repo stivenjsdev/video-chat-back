@@ -153,6 +153,9 @@ const disconnectHandler = (socket) => {
 
     // close the room if amount of the users which will stay in room will be 0
     if (room.connectedUsers.length > 0) {
+      // emit to all users which are still in the room that user disconnected
+      io.to(room.id).emit("user-disconnected", { socketId: socket.id });
+
       // emit an event to rest of the users which left in the room new connectedUsers in room
       io.to(room.id).emit("room-update", {
         connectedUsers: room.connectedUsers,
@@ -173,8 +176,9 @@ const signalingHandler = (data, socket) => {
 // information from clients which are already in room that they have prepared for incoming connection
 const initializeConnectionHandler = (data, socket) => {
   const { connUserSocketId } = data;
-  const initData = { connUserSocketId: socket.id};
-  io.to(connUserSocketId).emit("conn-init", initData)
+
+  const initData = { connUserSocketId: socket.id };
+  io.to(connUserSocketId).emit("conn-init", initData);
 };
 
 server.listen(PORT, () => {
